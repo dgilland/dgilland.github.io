@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html prefix="
+og: http://ogp.me/ns#
+article: http://ogp.me/ns/article#
+" lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Project: hashfs | Derrick Gilland</title>
+
+                <link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+
+                <link rel="alternate" type="application/rss+xml" title="RSS" href="../../rss.xml">
+
+      <link rel="canonical" href="http://derrickgilland.com/posts/new-project-hashfs/">
+
+            <link rel="icon" href="../../assets/img/favicon-32x32.png" sizes="32x32">
+            <link rel="icon" href="../../assets/img/favicon-192x192.png" sizes="192x192">
+            <link rel="icon" href="../../favicon.ico" sizes="16x16">
+            <link rel="icon" href="../../assets/img/favicon-96x96.png" sizes="96x96">
+            <link rel="icon" href="../../assets/img/favicon-160x160.png" sizes="160x160">
+
+
+
+    
+        <!--[if lt IE 9]><script src="../../assets/js/html5.js"></script><![endif]-->
+
+    
+
+    
+    <meta name="author" content="Derrick Gilland">
+        <link rel="prev" href="../verify-release-v100/" title="verify: Release v1.0.0" type="text/html">
+        <link rel="next" href="../hashfs-release-v050/" title="hashfs: Release v0.5.0" type="text/html">
+        <meta property="og:site_name" content="Derrick Gilland">
+    <meta property="og:title" content="New Project: hashfs">
+    <meta property="og:url" content="http://derrickgilland.com/posts/new-project-hashfs/">
+    <meta property="og:description" content="I've started a new Python project: hashfs
+HashFS is
+
+A content-addressable file management system for Python
+The major features of HashFS are
+
+Files are stored once and never duplicated.
+Uses an effic">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2015-06-05T18:01:21-04:00">
+           <meta property="article:tag" content="hashfs">
+           <meta property="article:tag" content="python">
+
+    
+    
+
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700%7CMerriweather:400,500%7CRaleway:400,500" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<!-- Menubar -->
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+<!-- This keeps the margins nice -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://derrickgilland.com/">
+
+                <span id="blog-title">Derrick Gilland</span>
+            </a>
+        </div>
+<!-- /.navbar-header -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                                <li>
+<a href="../../"><i class="fa fa-home fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../pages/about/">About</a>
+                </li>
+<li>
+<a href="../../pages/projects/">Projects</a>
+                </li>
+<li>
+<a href="../../archive.html">Archive</a>
+                </li>
+<li>
+<a href="../../categories/">Tags</a>
+
+                
+            </li>
+</ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                                    <li>
+<a href="https://github.com/dgilland"><i class="fa fa-github fa-lg"></i></a>
+                </li>
+<li>
+<a href="http://stackoverflow.com/users/681166/dgilland"><i class="fa fa-stack-overflow fa-lg"></i></a>
+                </li>
+<li>
+<a href="mailto:dgilland@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../rss.xml"><i class="fa fa-rss fa-lg"></i></a>
+
+                
+            </li>
+</ul>
+        </div>
+<!-- /.navbar-collapse -->
+    </div>
+<!-- /.container -->
+</nav>
+
+<!-- End of Menubar -->
+
+<div class="container" id="content" role="main">
+    <div class="body-content">
+        <!--Body content-->
+        <div class="row">
+            
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article">
+        <header>
+            <h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url" rel="bookmark">New Project: hashfs</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><time class="published dt-published" datetime="2015-06-05T18:01:21-04:00" itemprop="datePublished" title="June 05, 2015">June 05, 2015</time></p>
+                <p class="commentline">            <a href=".#disqus_thread" data-disqus-identifier="cache/posts/new-project-hashfs.html">Comments</a>
+
+
+            
+        </p>
+</div>
+        
+    </header>
+
+    <div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<p>I've started a new Python project: <a class="reference external" href="https://github.com/dgilland/hashfs">hashfs</a></p>
+<p>HashFS is</p>
+<blockquote>
+A content-addressable file management system for Python</blockquote>
+<p>The major features of HashFS are</p>
+<ul class="simple">
+<li>Files are stored once and never duplicated.</li>
+<li>Uses an efficient folder structure optimized for a large number of files. File paths are based on the content hash and are nested based on the first <tt class="docutils literal">n</tt> number of characters.</li>
+<li>Can save files from local file paths or readable objects (open file handlers, IO buffers, etc).</li>
+<li>Able to repair the root folder by reindexing all files. Useful if the hashing algorithm or folder structure options change or to initialize existing files.</li>
+<li>Supports any hashing algorithm available via <tt class="docutils literal">hashlib.new</tt>.</li>
+<li>Python 2.7+/3.3+ compatible.</li>
+</ul>
+<!-- TEASER_END -->
+<div class="section" id="current-release">
+<h2>Current Release</h2>
+<p>As of this writing, the latest version of hashfs is <a class="reference external" href="https://github.com/dgilland/hashfs/tree/v0.4.0">v0.4.0</a>.</p>
+<div class="section" id="sample-usage">
+<h3>Sample Usage</h3>
+<p><tt class="docutils literal">HashFS</tt> supports basic file storage, retrieval, and removal as well as some more advanced features like file repair.</p>
+</div>
+</div>
+<div class="section" id="storing-content">
+<h2>Storing Content</h2>
+<p>Add content to the folder using either readable objects (e.g. <tt class="docutils literal">StringIO</tt>) or file paths (e.g. <tt class="docutils literal">'a/path/to/some/file'</tt>).</p>
+<pre class="code python"><a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-1"></a><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-2"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-3"></a><span class="n">some_content</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="s">'some content'</span><span class="p">)</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-4"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-5"></a><span class="n">address</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">some_content</span><span class="p">)</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-6"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-7"></a><span class="c"># Or if you'd like to save the file with an extension...</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-8"></a><span class="n">address</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">some_content</span><span class="p">,</span> <span class="s">'.txt'</span><span class="p">)</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-9"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-10"></a><span class="c"># The id of the file (i.e. the hexdigest of its contents).</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-11"></a><span class="n">address</span><span class="o">.</span><span class="n">id</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-12"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-13"></a><span class="c"># The absolute path where the file was saved.</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-14"></a><span class="n">address</span><span class="o">.</span><span class="n">abspath</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-15"></a>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-16"></a><span class="c"># The path relative to fs.root.</span>
+<a name="rest_code_bdbfdd7fdd7b424fba76bdc42f185350-17"></a><span class="n">address</span><span class="o">.</span><span class="n">relpath</span>
+</pre>
+</div>
+<div class="section" id="retrieving-content">
+<h2>Retrieving Content</h2>
+<p>Get a <tt class="docutils literal">BufferedReader</tt> handler for an existing file by address ID or path.</p>
+<pre class="code python"><a name="rest_code_3172c770943a483282701cd0522625ad-1"></a><span class="n">fileio</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<a name="rest_code_3172c770943a483282701cd0522625ad-2"></a>
+<a name="rest_code_3172c770943a483282701cd0522625ad-3"></a><span class="c"># Or using the full path...</span>
+<a name="rest_code_3172c770943a483282701cd0522625ad-4"></a><span class="n">fileio</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">abspath</span><span class="p">)</span>
+<a name="rest_code_3172c770943a483282701cd0522625ad-5"></a>
+<a name="rest_code_3172c770943a483282701cd0522625ad-6"></a><span class="c"># Or using a path relative to fs.root</span>
+<a name="rest_code_3172c770943a483282701cd0522625ad-7"></a><span class="n">fileio</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">relpath</span><span class="p">)</span>
+</pre>
+</div>
+<div class="section" id="removing-content">
+<h2>Removing Content</h2>
+<p>Delete a file by address ID or path.</p>
+<pre class="code python"><a name="rest_code_4db154e4878c450fb60be43612ee7e88-1"></a><span class="n">fs</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<a name="rest_code_4db154e4878c450fb60be43612ee7e88-2"></a><span class="n">fs</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">abspath</span><span class="p">)</span>
+<a name="rest_code_4db154e4878c450fb60be43612ee7e88-3"></a><span class="n">fs</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">address</span><span class="o">.</span><span class="n">relpath</span><span class="p">)</span>
+</pre>
+<p>For more details, please see the full documentation at <a class="reference external" href="http://hashfs.readthedocs.org">http://hashfs.readthedocs.org</a> and follow development at <a class="reference external" href="https://github.com/dgilland/hashfs">https://github.com/dgilland/hashfs</a>.</p>
+</div>
+</div>
+    </div>
+    <aside class="postpromonav">
+    <nav>
+            <ul itemprop="keywords" class="tags">
+           <li><a class="tag p-category" href="../../categories/hashfs/" rel="tag">hashfs</a></li>
+           <li><a class="tag p-category" href="../../categories/python/" rel="tag">python</a></li>
+        </ul>
+
+            <ul class="pager">
+            <li class="previous">
+                <a href="../verify-release-v100/" rel="prev" title="verify: Release v1.0.0">Previous post</a>
+            </li>
+            <li class="next">
+                <a href="../hashfs-release-v050/" rel="next" title="hashfs: Release v0.5.0">Next post</a>
+            </li>
+        </ul>
+
+    </nav>
+    </aside>
+        <section class="comments">
+        <h2>Comments</h2>
+                        <div id="disqus_thread"></div>
+        <script>
+        var disqus_shortname ="derrickgilland",
+            disqus_url="http://derrickgilland.com/posts/new-project-hashfs/",
+        disqus_title="New Project: hashfs",
+        disqus_identifier="cache/posts/new-project-hashfs.html",
+        disqus_config = function () {
+            this.language = "en";
+        };
+        (function() {
+            var dsq = document.createElement('script'); dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+    <a href="//disqus.com" class="dsq-brlink" rel="nofollow">Comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+        </section>
+    
+</article>
+               <script>var disqus_shortname="derrickgilland";(function(){var a=document.createElement("script");a.async=true;a.src="//"+disqus_shortname+".disqus.com/count.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)}());</script>
+
+
+        </div>
+        <!--End of body content-->
+
+        <footer>
+            <a href="mailto:dgilland@gmail.com">Derrick Gilland</a> - Blog powered by <a href="http://getnikola.com" rel="nofollow">Nikola</a> 
+            
+        </footer>
+    </div>
+</div>
+
+            <script src="../../assets/js/all-nocdn.js"></script>
+    
+
+    <script>jQuery("a.image-reference,!.islink").colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script>
+    <!-- fancy dates -->
+    <script>
+    moment.locale("");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script>
+    <!-- end fancy dates -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58266216-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+</body>
+</html>

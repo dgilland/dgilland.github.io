@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../assets/xml/rss.xsl" media="all"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Derrick Gilland (static-generators)</title><link>http://derrickgilland.com/</link><description></description><atom:link href="http://derrickgilland.com/categories/static-generators.xml" type="application/rss+xml" rel="self"></atom:link><language>en</language><lastBuildDate>Thu, 07 Jul 2016 20:20:14 GMT</lastBuildDate><generator>http://getnikola.com/</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Deploying a Static Blog to Github Pages</title><link>http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/</link><dc:creator>Derrick Gilland</dc:creator><description>&lt;div&gt;&lt;p&gt;One of the challenges when deploying a static blog site to &lt;a class="reference external" href="https://pages.github.com"&gt;Github Pages&lt;/a&gt; is having a good workflow for accomplishing the task easily. By default Github Pages will use Jekyll to build your site for you, but if you're using something else besides Jekyll, then you're on your own.&lt;/p&gt;
+&lt;p&gt;For my static blog site (powered by &lt;a class="reference external" href="https://www.python.org/"&gt;Python&lt;/a&gt; and &lt;a class="reference external" href="http://getnikola.com"&gt;Nikola&lt;/a&gt;), I decided to take the following approach:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Have two repositories: (1) for the &lt;a class="reference external" href="https://github.com/dgilland/blog"&gt;source code&lt;/a&gt; and (2) for the &lt;a class="reference external" href="https://github.com/dgilland/dgilland.github.io"&gt;deployed site&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Only maintain version history in the source code repository (1) while deploying a snapshot with no history to (2).&lt;/li&gt;
+&lt;li&gt;Have a single command for deployment.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/"&gt;Read more…&lt;/a&gt; (4 min remaining to read)&lt;/p&gt;&lt;/div&gt;</description><category>github</category><category>static-generators</category><guid>http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/</guid><pubDate>Tue, 06 Jan 2015 21:02:53 GMT</pubDate></item><item><title>First Post</title><link>http://derrickgilland.com/posts/first-post/</link><dc:creator>Derrick Gilland</dc:creator><description>&lt;div&gt;&lt;p&gt;This is my obligatory first post where I describe the foundations of this blog and why I started it.&lt;/p&gt;
+&lt;div class="section" id="motivation"&gt;
+&lt;h2&gt;Motivation&lt;/h2&gt;
+&lt;p&gt;My main motivation for creating this blog was to put my thoughts down in digital format. I wanted an outlet to expand upon my experiences in software engineering and the open source Python community.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="choosing-a-static-site-generator"&gt;
+&lt;h2&gt;Choosing a Static Site Generator&lt;/h2&gt;
+&lt;p&gt;I always thought that my first blog would be backed by something like &lt;a class="reference external" href="https://wordpress.org/"&gt;Wordpress&lt;/a&gt;, but that was years ago. Now that I've actually built one, I've chosen a static site generator instead. Before implementing this site, I researched several static blog engines to find one that best met my needs. Along the way, I researched &lt;a class="reference external" href="http://blog.getpelican.com/"&gt;Pelican&lt;/a&gt;, &lt;a class="reference external" href="http://tinkerer.me/"&gt;Tinkerer&lt;/a&gt;, and &lt;a class="reference external" href="http://getnikola.com/"&gt;Nikola&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;My main requirements for a static blogging platform were:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Easy to use&lt;/li&gt;
+&lt;li&gt;Supports reStructuredText&lt;/li&gt;
+&lt;li&gt;Uses Jinja for templating&lt;/li&gt;
+&lt;li&gt;Sufficient features&lt;/li&gt;
+&lt;li&gt;Not overly complicated&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://derrickgilland.com/posts/first-post/"&gt;Read more…&lt;/a&gt; (2 min remaining to read)&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</description><category>python</category><category>static-generators</category><guid>http://derrickgilland.com/posts/first-post/</guid><pubDate>Fri, 02 Jan 2015 20:52:00 GMT</pubDate></item></channel></rss>

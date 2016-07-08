@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html prefix="
+og: http://ogp.me/ns#
+article: http://ogp.me/ns/article#
+" lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demystifying Flask-SQLAlchemy | Derrick Gilland</title>
+
+                <link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+
+                <link rel="alternate" type="application/rss+xml" title="RSS" href="../../rss.xml">
+
+      <link rel="canonical" href="http://derrickgilland.com/posts/demystifying-flask-sqlalchemy/">
+
+            <link rel="icon" href="../../assets/img/favicon-32x32.png" sizes="32x32">
+            <link rel="icon" href="../../assets/img/favicon-192x192.png" sizes="192x192">
+            <link rel="icon" href="../../favicon.ico" sizes="16x16">
+            <link rel="icon" href="../../assets/img/favicon-96x96.png" sizes="96x96">
+            <link rel="icon" href="../../assets/img/favicon-160x160.png" sizes="160x160">
+
+
+
+    
+        <!--[if lt IE 9]><script src="../../assets/js/html5.js"></script><![endif]-->
+
+    
+
+    
+    <meta name="author" content="Derrick Gilland">
+        <link rel="prev" href="../pydash-release-v241/" title="pydash: Release v2.4.1" type="text/html">
+        <link rel="next" href="../omdbpy-release-v030/" title="omdb.py: Release v0.3.0" type="text/html">
+        <meta property="og:site_name" content="Derrick Gilland">
+    <meta property="og:title" content="Demystifying Flask-SQLAlchemy">
+    <meta property="og:url" content="http://derrickgilland.com/posts/demystifying-flask-sqlalchemy/">
+    <meta property="og:description" content="It seems that one of the biggest questions around Flask-SQLAlchemy is how to use SQLAlchemy models outside of a Flask application. Several questions have been posted on sites like Stackoverflow and Re">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2015-01-12T20:49:03-05:00">
+           <meta property="article:tag" content="alchy">
+           <meta property="article:tag" content="flask">
+           <meta property="article:tag" content="flask-alchy">
+           <meta property="article:tag" content="flask-sqlalchemy">
+           <meta property="article:tag" content="python">
+           <meta property="article:tag" content="sqlalchemy">
+
+    
+    
+
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700%7CMerriweather:400,500%7CRaleway:400,500" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<!-- Menubar -->
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+<!-- This keeps the margins nice -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://derrickgilland.com/">
+
+                <span id="blog-title">Derrick Gilland</span>
+            </a>
+        </div>
+<!-- /.navbar-header -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                                <li>
+<a href="../../"><i class="fa fa-home fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../pages/about/">About</a>
+                </li>
+<li>
+<a href="../../pages/projects/">Projects</a>
+                </li>
+<li>
+<a href="../../archive.html">Archive</a>
+                </li>
+<li>
+<a href="../../categories/">Tags</a>
+
+                
+            </li>
+</ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                                    <li>
+<a href="https://github.com/dgilland"><i class="fa fa-github fa-lg"></i></a>
+                </li>
+<li>
+<a href="http://stackoverflow.com/users/681166/dgilland"><i class="fa fa-stack-overflow fa-lg"></i></a>
+                </li>
+<li>
+<a href="mailto:dgilland@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../rss.xml"><i class="fa fa-rss fa-lg"></i></a>
+
+                
+            </li>
+</ul>
+        </div>
+<!-- /.navbar-collapse -->
+    </div>
+<!-- /.container -->
+</nav>
+
+<!-- End of Menubar -->
+
+<div class="container" id="content" role="main">
+    <div class="body-content">
+        <!--Body content-->
+        <div class="row">
+            
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article">
+        <header>
+            <h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url" rel="bookmark">Demystifying Flask-SQLAlchemy</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><time class="published dt-published" datetime="2015-01-12T20:49:03-05:00" itemprop="datePublished" title="January 12, 2015">January 12, 2015</time></p>
+                <p class="commentline">            <a href=".#disqus_thread" data-disqus-identifier="cache/posts/demystifying-flask-sqlalchemy.html">Comments</a>
+
+
+            
+        </p>
+</div>
+        
+    </header>
+
+    <div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<p>It seems that one of the biggest questions around <a class="reference external" href="https://pythonhosted.org/Flask-SQLAlchemy/">Flask-SQLAlchemy</a> is how to use <a class="reference external" href="http://www.sqlalchemy.org/">SQLAlchemy</a> models outside of a <a class="reference external" href="flask.pocoo.org">Flask</a> application. Several questions have been posted on sites like <a class="reference external" href="http://stackoverflow.com/questions/19119725/how-to-use-flask-sqlalchemy-with-existing-sqlalchemy-model">Stackoverflow</a> and <a class="reference external" href="http://www.reddit.com/r/flask/comments/2qxah2/how_to_access_flasksqlalchemy_models_outside/">Reddit</a>. There is an open issue <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/issues/98">on Github</a> asking to document how to use your own <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/api.html?highlight=declarative#module-sqlalchemy.ext.declarative">declarative base class</a>. As of this writing, there are even <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/pull/240">several</a> <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/pull/250">pull</a> <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/pull/255">requests</a> to make Flask-SQLAlchemy easier to work with in this regard. However, none of the answers or discussions really take the time to parse through what Flask-SQLAlchemy does internally and how you can effectively decouple SQLAlchemy model integration from Flask-SQLAlchemy.</p>
+<!-- TEASER_END -->
+<div class="section" id="what-is-flask-sqlalchemy">
+<h2>What is Flask-SQLAlchemy?</h2>
+<p>Flask-SQLAlchemy's functionality can be broken down into several core components:</p>
+<ul class="simple">
+<li>Database <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L746">session configuration</a> and <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L775">session management</a> within an HTTP request context</li>
+<li>Custom <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L175">signalling events</a> that fire before and after models are committed and after a transaction rollback</li>
+<li>Custom <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L733">declarative</a> <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L696">base</a> <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L585">model</a> with support for <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L445">query property</a> and <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L296">pagination</a>
+</li>
+<li>Proxy access from the <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L705">extension instance</a> to the <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L89">SQLAlchemy module</a>
+</li>
+<li>Other minor conveniences like <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L922">creating</a>/<a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L930">dropping</a> all models, <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L711">accessing model metadata</a>, <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L557">autogenerating table names</a>, and <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L792">applying driver hacks</a>
+</li>
+</ul>
+<p><strong>NOTE:</strong> The links to Flask-SQLAlchemy's source code are pinned to the latest commit at the time of this writing.</p>
+<div class="section" id="database-session-configuration-and-management">
+<h3>Database Session Configuration and Management</h3>
+<p>This part of Flask-SQLAlchemy is quite useful when using Flask since it handles the session configuration, setup, and teardown for you. The teardown part is especially useful since it cleans up the session after the HTTP request is finished (not doing this properly can lead to stale or error-locked sessions that need to be rolled back before being usable again).</p>
+</div>
+<div class="section" id="id1">
+<h3>Signalling Events</h3>
+<p>This is something I don't find that useful when using Flask-SQLAlchemy. SQLAlchemy already provides a more robust event interface for <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/core/event.html">core</a> and and <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/orm/events.html">ORM</a> events. Besides, it appears that this feature will be <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/pull/150#issuecomment-69002922">deprecated</a> in a <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/pull/256">future version</a>.</p>
+</div>
+<div class="section" id="proxy-access-to-sqlalchemy-module">
+<h3>Proxy Access to SQLAlchemy Module</h3>
+<p>When an instance of <tt class="docutils literal">flask_sqlalchemy.SQLAlchemy</tt> is created, the entire SQLAlchemy module is <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L89">proxied to that instance</a> along with a few other methods like <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L95">Table</a>, <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L96">relationship</a>, <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L98">dynamic loader</a>, etc. If your goal is to not tie yourself completely to Flask-SQLAlchemy, then there is no reason to use any of these attributes. It's much clearer to use the SQLAlchemy module directly anyway.</p>
+</div>
+<div class="section" id="declarative-base-model">
+<h3>Declarative Base Model</h3>
+<p>This is probably the single biggest part of Flask-SQLAlchemy that gives people trouble when trying to de-couple SQLAlchemy from Flask. Many people start out using Flask-SQLAlchemy's declarative base model because it's quick and convenient:</p>
+<pre class="code python"><a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-1"></a><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-2"></a><span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-3"></a>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-4"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-5"></a><span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-6"></a>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-7"></a><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-8"></a>    <span class="c"># define user model</span>
+<a name="rest_code_beceeef3262e4bf7a0113538cf5ec141-9"></a>    <span class="k">pass</span>
+</pre>
+<p>So what's wrong with this? The main problem is that <tt class="docutils literal">db.Model</tt> is directly coupled to the <tt class="docutils literal">SQLAlchemy</tt> instance. It's not portable in the same way that a regular declarative model class would be: it's not directly importable and it's coupled to the instance that is also responsible for managing the database session. The only way to share this model is to import the <tt class="docutils literal">db</tt> object which ties all of your model definitions to Flask-SQLAlchemy and, subsequently, Flask.</p>
+<p>However, Flask-SQLAlchemy's declarative base does provide some useful features like the ability to execute a query using the model's query property:</p>
+<pre class="code python"><a name="rest_code_f96e097c22cd42d89ac1df5e3239cc95-1"></a><span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">active</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<a name="rest_code_f96e097c22cd42d89ac1df5e3239cc95-2"></a><span class="c"># which is equivalent to...</span>
+<a name="rest_code_f96e097c22cd42d89ac1df5e3239cc95-3"></a><span class="n">users</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">active</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre>
+<p>and pagination:</p>
+<pre class="code python"><a name="rest_code_7ca51f53c2e64234ab552dc426c6393f-1"></a><span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<a name="rest_code_7ca51f53c2e64234ab552dc426c6393f-2"></a><span class="n">next_users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<a name="rest_code_7ca51f53c2e64234ab552dc426c6393f-3"></a><span class="n">prev_users</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">prev</span><span class="p">()</span>
+</pre>
+<p>But this isn't that hard to set up yourself when needed.</p>
+</div>
+</div>
+<div class="section" id="decoupling-flask-sqlalchemy">
+<h2>Decoupling Flask-SQLAlchemy</h2>
+<p>It's my opinion that the design of Flask-SQLAlchemy is hampered by the coupling of the declarative base model with the extension's class instance. The extension should really only be concerned with a few things:</p>
+<ul class="simple">
+<li>Database session configuration</li>
+<li>Database session management</li>
+<li>Configuration of the query property on a declarative base model <em>that is passed into the extension</em>
+</li>
+</ul>
+<p>A separate library that provides the declarative base could then be created that would do what Flask-SQLAlchemy's base model does but not have the dependence on Flask and which would be easily usable in non-Flask contexts.</p>
+<p>So what's the way forward for decoupling the declarative base from Flask-SQLAlchemy but still having SQLAlchemy models that behave as if they were using Flask-SQLAlchemy's <tt class="docutils literal">Model</tt> class?</p>
+<div class="section" id="creating-a-declarative-base-model">
+<h3>Creating a Declarative Base Model</h3>
+<p>First, we need to define our own declarative base model so that we aren't dependent on Flask-SQLAlchemy's. A good starting point would be to simply copy Flask-SQLAlchemy's own model class (renamed here to add distinction between the base model class and the declarative base class created by SQLAlchemy):</p>
+<pre class="code python"><a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-1"></a><span class="c"># in models/base.py</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-2"></a>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-3"></a><span class="k">class</span> <span class="nc">ModelBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-4"></a>    <span class="sd">"""Baseclass for custom user models."""</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-5"></a>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-6"></a>    <span class="c">#: the query class used. The `query` attribute is an instance</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-7"></a>    <span class="c">#: of this class. By default a `BaseQuery` is used.</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-8"></a>    <span class="n">query_class</span> <span class="o">=</span> <span class="n">BaseQuery</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-9"></a>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-10"></a>    <span class="c">#: an instance of `query_class`. Can be used to query the</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-11"></a>    <span class="c">#: database for instances of this model.</span>
+<a name="rest_code_64f5a9ec34c54512b163a0ce122abd99-12"></a>    <span class="n">query</span> <span class="o">=</span> <span class="bp">None</span>
+</pre>
+<p>and, subsequently, we'll create the declarative base (ignore for the moment the <tt class="docutils literal">query</tt> and <tt class="docutils literal">query_class</tt> attributes; I'll come back to those shortly):</p>
+<pre class="code python"><a name="rest_code_1e3433aa46c04c028031a3ca69a0e92c-1"></a><span class="c"># in models/base.py</span>
+<a name="rest_code_1e3433aa46c04c028031a3ca69a0e92c-2"></a>
+<a name="rest_code_1e3433aa46c04c028031a3ca69a0e92c-3"></a><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<a name="rest_code_1e3433aa46c04c028031a3ca69a0e92c-4"></a>
+<a name="rest_code_1e3433aa46c04c028031a3ca69a0e92c-5"></a><span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="n">ModelBase</span><span class="p">)</span>
+</pre>
+<p>This will become the common source for all future SQLAlchemy classes. For example:</p>
+<pre class="code python"><a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-1"></a><span class="c"># in models/user.py</span>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-2"></a>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-3"></a><span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Model</span>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-4"></a>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-5"></a><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-6"></a>    <span class="c"># define user model</span>
+<a name="rest_code_29dade4db6fa4eb3a96f6ad07d62dd1a-7"></a>    <span class="k">pass</span>
+</pre>
+</div>
+<div class="section" id="creating-a-query-class-property">
+<h3>Creating a Query Class Property</h3>
+<p>The <tt class="docutils literal">ModelBase</tt> definition above includes references to a query class and query property. The query class is either SQLAlchemy's <tt class="docutils literal">orm.Query</tt> class or a child class that inherits from it. The query property is what allows the <tt class="docutils literal">User.query</tt> style access and is easy to create, but does require access to the database session when setting up.</p>
+<p>Again, basing our query class off of Flask-SQLAlchemy:</p>
+<pre class="code python"><a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-1"></a><span class="c"># in models/base.py</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-2"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-3"></a><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">orm</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-4"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-5"></a><span class="k">class</span> <span class="nc">BaseQuery</span><span class="p">(</span><span class="n">orm</span><span class="o">.</span><span class="n">Query</span><span class="p">):</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-6"></a>    <span class="sd">"""The default query object used for models. This can be</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-7"></a><span class="sd">    subclassed and replaced for individual models by setting</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-8"></a><span class="sd">    the Model.query_class attribute. This is a subclass of a</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-9"></a><span class="sd">    standard SQLAlchemy sqlalchemy.orm.query.Query class and</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-10"></a><span class="sd">    has all the methods of a standard query as well.</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-11"></a><span class="sd">    """</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-12"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-13"></a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">error_out</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-14"></a>        <span class="sd">"""Return `Pagination` instance using already defined query</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-15"></a><span class="sd">        parameters.</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-16"></a><span class="sd">        """</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-17"></a>        <span class="k">if</span> <span class="n">error_out</span> <span class="ow">and</span> <span class="n">page</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-18"></a>            <span class="k">raise</span> <span class="ne">IndexError</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-19"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-20"></a>        <span class="k">if</span> <span class="n">per_page</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-21"></a>            <span class="n">per_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PER_PAGE</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-22"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-23"></a>        <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-24"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-25"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span> <span class="ow">and</span> <span class="n">page</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">error_out</span><span class="p">:</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-26"></a>            <span class="k">raise</span> <span class="ne">IndexError</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-27"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-28"></a>        <span class="c"># No need to count if we're on the first page and there are fewer items</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-29"></a>        <span class="c"># than we expected.</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-30"></a>        <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">per_page</span><span class="p">:</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-31"></a>            <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-32"></a>        <span class="k">else</span><span class="p">:</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-33"></a>            <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-34"></a>
+<a name="rest_code_f77ad9bc94c94f94a8240f2e8d4e8373-35"></a>        <span class="k">return</span> <span class="n">Pagination</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+</pre>
+<p>And our pagination class:</p>
+<pre class="code python"><a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-1"></a><span class="k">class</span> <span class="nc">Pagination</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-2"></a>    <span class="sd">"""Class returned by `Query.paginate`. You can also construct</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-3"></a><span class="sd">    it from any other SQLAlchemy query object if you are working</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-4"></a><span class="sd">    with other libraries. Additionally it is possible to pass</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-5"></a><span class="sd">    ``None`` as query object in which case the `prev` and `next`</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-6"></a><span class="sd">    will no longer work.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-7"></a><span class="sd">    """</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-8"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-9"></a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-10"></a>        <span class="c">#: The query object that was used to create this pagination object.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-11"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-12"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-13"></a>        <span class="c">#: The current page number (1 indexed).</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="n">page</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-15"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-16"></a>        <span class="c">#: The number of items to be displayed on a page.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-17"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-18"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-19"></a>        <span class="c">#: The total number of items matching the query.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-20"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="n">total</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-21"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-22"></a>        <span class="c">#: The items for the current page.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-23"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="n">items</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-24"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-25"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-26"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pages</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-27"></a>        <span class="k">else</span><span class="p">:</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-28"></a>            <span class="c">#: The total number of pages.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-29"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">)))</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-30"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-31"></a>        <span class="c">#: Number of the previous page.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-32"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">prev_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">-</span> <span class="mi">1</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-33"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-34"></a>        <span class="c">#: True if a previous page exists.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-35"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">has_prev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">&gt;</span> <span class="mi">1</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-36"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-37"></a>        <span class="c">#: Number of the next page.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-38"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-39"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-40"></a>        <span class="c">#: True if a next page exists.</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-41"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">has_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pages</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-42"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-43"></a>    <span class="k">def</span> <span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_out</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-44"></a>        <span class="sd">"""Returns a `Pagination` object for the previous page."""</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-45"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> \
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-46"></a>            <span class="s">'a query object is required for this method to work'</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-47"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">,</span> <span class="n">error_out</span><span class="p">)</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-48"></a>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-49"></a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_out</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-50"></a>        <span class="sd">"""Returns a `Pagination` object for the next page."""</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-51"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> \
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-52"></a>            <span class="s">'a query object is required for this method to work'</span>
+<a name="rest_code_2bdee7ec990b4847a7b8421b68380e87-53"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">,</span> <span class="n">error_out</span><span class="p">)</span>
+</pre>
+<p>If you compare the above to Flask-SQLAlchemy's <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L395">BaseQuery</a> and <a class="reference external" href="https://github.com/mitsuhiko/flask-sqlalchemy/blob/e05ffe15c0f2feac19bb02f417b473fd83c88d71/flask_sqlalchemy/__init__.py#L296">Pagination</a> classes, you'll notice that they differ slightly. I've taken the liberty of removing usage of the Flask specific function <tt class="docutils literal">abort</tt> so that our implementation is not tied to Flask along with some other minor changes. Additional "glue" code would be needed to reintegrate that behavior when using the query class inside a Flask app but that is beyond the scope of this article.</p>
+<p>For the query property functionality, we need to define our query property class:</p>
+<pre class="code python"><a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-1"></a><span class="c"># in models/base.py</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-2"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-3"></a><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">orm</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-4"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-5"></a><span class="k">class</span> <span class="nc">QueryProperty</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-6"></a>    <span class="sd">"""Query property accessor which gives a model access to query capabilities</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-7"></a><span class="sd">    via `ModelBase.query` which is equivalent to ``session.query(Model)``.</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-8"></a><span class="sd">    """</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-9"></a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-11"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-12"></a>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-13"></a>        <span class="n">mapper</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">class_mapper</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-14"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-15"></a>        <span class="k">if</span> <span class="n">mapper</span><span class="p">:</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-16"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="s">'query_class'</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-17"></a>                <span class="n">Model</span><span class="o">.</span><span class="n">query_class</span> <span class="o">=</span> <span class="n">BaseQuery</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-18"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-19"></a>            <span class="n">query_property</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">query_class</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">())</span>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-20"></a>
+<a name="rest_code_fdbcb73cb64748b9b7786df5e883bd3f-21"></a>            <span class="k">return</span> <span class="n">query_property</span>
+</pre>
+<p>and a helper method for attaching the query property to the model:</p>
+<pre class="code python"><a name="rest_code_796a960d40e14c53acb889ec9df799f7-1"></a><span class="k">def</span> <span class="nf">set_query_property</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<a name="rest_code_796a960d40e14c53acb889ec9df799f7-2"></a>    <span class="n">model_class</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">QueryProperty</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+</pre>
+</div>
+</div>
+<div class="section" id="extending-flask-sqlalchemy">
+<h2>Extending Flask-SQLAlchemy</h2>
+<p>Finally, we need to extend Flask-SQLAlchemy's <tt class="docutils literal">SQLAlchemy</tt> class to work with custom declarative bases:</p>
+<pre class="code python"><a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-1"></a><span class="c"># in ext/database.py</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-2"></a>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-3"></a><span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span> <span class="k">as</span> <span class="n">SQLAlchemyBase</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-4"></a>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-5"></a><span class="kn">from</span> <span class="nn">..models.base</span> <span class="kn">import</span> <span class="n">set_query_property</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-6"></a>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-7"></a><span class="k">class</span> <span class="nc">SQLAlchemy</span><span class="p">(</span><span class="n">SQLAlchemyBase</span><span class="p">):</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-8"></a>    <span class="sd">"""Flask extension that integrates alchy with Flask-SQLAlchemy."""</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-9"></a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-10"></a>                 <span class="n">app</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-11"></a>                 <span class="n">use_native_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-12"></a>                 <span class="n">session_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-13"></a>                 <span class="n">Model</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">Model</span> <span class="o">=</span> <span class="n">Model</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-15"></a>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-16"></a>        <span class="nb">super</span><span class="p">(</span><span class="n">SQLAlchemy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">app</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-17"></a>                                         <span class="n">use_native_unicode</span><span class="p">,</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-18"></a>                                         <span class="n">session_options</span><span class="p">)</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-19"></a>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-20"></a>    <span class="k">def</span> <span class="nf">make_declarative_base</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-21"></a>        <span class="sd">"""Creates or extends the declarative base."""</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-22"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-23"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">Model</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SQLAlchemyBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">make_declarative_base</span><span class="p">()</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-24"></a>        <span class="k">else</span><span class="p">:</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-25"></a>            <span class="n">set_query_property</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+<a name="rest_code_6f9d6bfbafdf465182612c26a0ce3641-26"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Model</span>
+</pre>
+<p>Now, we can replace the Flask-SQLAlchemy usage example with:</p>
+<pre class="code python"><a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-1"></a><span class="c"># in app.py</span>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-2"></a>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-3"></a><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-4"></a>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-5"></a><span class="kn">from</span> <span class="nn">.ext.database</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-6"></a><span class="kn">from</span> <span class="nn">.models.base</span> <span class="kn">import</span> <span class="n">Model</span>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-7"></a>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-8"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<a name="rest_code_8aa2990db7a74c5197e2f90278c502e4-9"></a><span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">Model</span><span class="o">=</span><span class="n">Model</span><span class="p">)</span>
+</pre>
+<p>The new usage is almost identical to the original except for the fact that the <tt class="docutils literal">Model</tt> class is now defined outside of Flask-SQLAlchemy and can easily be used in non-Flask contexts.</p>
+</div>
+<div class="section" id="beyond-flask-sqlalchemy">
+<h2>Beyond Flask-SQLAlchemy</h2>
+<p>I mentioned above that it was my opinion that the base model and query classes should be separated from Flask-SQLAlchemy and converted into their own library. I explained the basic process for pulling those components from Flask-SQLAlchemy which could then be used as a basis for this new library. However, that was something that I already did with my own projects: <a class="reference external" href="https://github.com/dgilland/alchy">alchy</a> and <a class="reference external" href="https://github.com/dgilland/flask-alchy">Flask-Alchy</a>.</p>
+<p>Alchy was created from my desire to separate the model-related parts of Flask-SQLAlchemy into a stand-alone library that could be used anywhere. I would encourage you to check out the <a class="reference external" href="http://alchy.readthedocs.org/en/latest/">docs</a> for yourself to see what alchy has to offer. It goes well beyond Flask-SQLAlchemy to provide features like:</p>
+<ul class="simple">
+<li>Its own session manager: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/api.html#module-alchy.manager">alchy.Manager</a>
+</li>
+<li>Integration with SQLAlchemy's <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/orm/events.html">ORM events</a> at the model level: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/api.html#module-alchy.events">alchy.events</a>
+</li>
+<li>Query class integration with SQLAlchemy's <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/orm/loading_relationships.html#relationship-loader-api">Loader API</a>: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/api.html#module-alchy.query">alchy.Query</a>
+</li>
+<li>Model to dictionary serialization: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/_modules/alchy/model.html#ModelBase.to_dict">alchy.Model.to_dict</a>
+</li>
+<li>Better model updating with support for nested relationships: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/_modules/alchy/model.html#ModelBase.update">alchy.Model.update</a>
+</li>
+<li>Numerous base model methods and properties: <a class="reference external" href="http://alchy.readthedocs.org/en/latest/api.html#module-alchy.model">alchy.Model</a>
+</li>
+</ul>
+<p>You can get alchy on <a class="reference external" href="https://github.com/dgilland/alchy">Github</a> or <a class="reference external" href="https://pypi.python.org/pypi/alchy/">PyPI</a>.</p>
+</div>
+</div>
+    </div>
+    <aside class="postpromonav">
+    <nav>
+            <ul itemprop="keywords" class="tags">
+           <li><a class="tag p-category" href="../../categories/alchy/" rel="tag">alchy</a></li>
+           <li><a class="tag p-category" href="../../categories/flask/" rel="tag">flask</a></li>
+           <li><a class="tag p-category" href="../../categories/flask-alchy/" rel="tag">flask-alchy</a></li>
+           <li><a class="tag p-category" href="../../categories/flask-sqlalchemy/" rel="tag">flask-sqlalchemy</a></li>
+           <li><a class="tag p-category" href="../../categories/python/" rel="tag">python</a></li>
+           <li><a class="tag p-category" href="../../categories/sqlalchemy/" rel="tag">sqlalchemy</a></li>
+        </ul>
+
+            <ul class="pager">
+            <li class="previous">
+                <a href="../pydash-release-v241/" rel="prev" title="pydash: Release v2.4.1">Previous post</a>
+            </li>
+            <li class="next">
+                <a href="../omdbpy-release-v030/" rel="next" title="omdb.py: Release v0.3.0">Next post</a>
+            </li>
+        </ul>
+
+    </nav>
+    </aside>
+        <section class="comments">
+        <h2>Comments</h2>
+                        <div id="disqus_thread"></div>
+        <script>
+        var disqus_shortname ="derrickgilland",
+            disqus_url="http://derrickgilland.com/posts/demystifying-flask-sqlalchemy/",
+        disqus_title="Demystifying Flask-SQLAlchemy",
+        disqus_identifier="cache/posts/demystifying-flask-sqlalchemy.html",
+        disqus_config = function () {
+            this.language = "en";
+        };
+        (function() {
+            var dsq = document.createElement('script'); dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+    <a href="//disqus.com" class="dsq-brlink" rel="nofollow">Comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+        </section>
+    
+</article>
+               <script>var disqus_shortname="derrickgilland";(function(){var a=document.createElement("script");a.async=true;a.src="//"+disqus_shortname+".disqus.com/count.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)}());</script>
+
+
+        </div>
+        <!--End of body content-->
+
+        <footer>
+            <a href="mailto:dgilland@gmail.com">Derrick Gilland</a> - Blog powered by <a href="http://getnikola.com" rel="nofollow">Nikola</a> 
+            
+        </footer>
+    </div>
+</div>
+
+            <script src="../../assets/js/all-nocdn.js"></script>
+    
+
+    <script>jQuery("a.image-reference,!.islink").colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script>
+    <!-- fancy dates -->
+    <script>
+    moment.locale("");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script>
+    <!-- end fancy dates -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58266216-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+</body>
+</html>

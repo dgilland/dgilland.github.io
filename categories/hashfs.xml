@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../assets/xml/rss.xsl" media="all"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Derrick Gilland (hashfs)</title><link>http://derrickgilland.com/</link><description></description><atom:link href="http://derrickgilland.com/categories/hashfs.xml" type="application/rss+xml" rel="self"></atom:link><language>en</language><lastBuildDate>Thu, 07 Jul 2016 20:20:13 GMT</lastBuildDate><generator>http://getnikola.com/</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>hashfs: Release v0.5.0</title><link>http://derrickgilland.com/posts/hashfs-release-v050/</link><dc:creator>Derrick Gilland</dc:creator><description>&lt;div&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/dgilland/hashfs/tree/v0.5.0"&gt;HashFS v0.5.0&lt;/a&gt; has been released.&lt;/p&gt;
+&lt;p&gt;It was a minor feature release that added an &lt;tt class="docutils literal"&gt;is_duplicate&lt;/tt&gt; attribute to &lt;tt class="docutils literal"&gt;HashAddress&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://derrickgilland.com/posts/hashfs-release-v050/"&gt;Read more…&lt;/a&gt; (1 min remaining to read)&lt;/p&gt;&lt;/div&gt;</description><category>hashfs</category><category>python</category><category>release</category><guid>http://derrickgilland.com/posts/hashfs-release-v050/</guid><pubDate>Mon, 06 Jul 2015 22:01:14 GMT</pubDate></item><item><title>New Project: hashfs</title><link>http://derrickgilland.com/posts/new-project-hashfs/</link><dc:creator>Derrick Gilland</dc:creator><description>&lt;div&gt;&lt;p&gt;I've started a new Python project: &lt;a class="reference external" href="https://github.com/dgilland/hashfs"&gt;hashfs&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;HashFS is&lt;/p&gt;
+&lt;blockquote&gt;
+A content-addressable file management system for Python&lt;/blockquote&gt;
+&lt;p&gt;The major features of HashFS are&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Files are stored once and never duplicated.&lt;/li&gt;
+&lt;li&gt;Uses an efficient folder structure optimized for a large number of files. File paths are based on the content hash and are nested based on the first &lt;tt class="docutils literal"&gt;n&lt;/tt&gt; number of characters.&lt;/li&gt;
+&lt;li&gt;Can save files from local file paths or readable objects (open file handlers, IO buffers, etc).&lt;/li&gt;
+&lt;li&gt;Able to repair the root folder by reindexing all files. Useful if the hashing algorithm or folder structure options change or to initialize existing files.&lt;/li&gt;
+&lt;li&gt;Supports any hashing algorithm available via &lt;tt class="docutils literal"&gt;hashlib.new&lt;/tt&gt;.&lt;/li&gt;
+&lt;li&gt;Python 2.7+/3.3+ compatible.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://derrickgilland.com/posts/new-project-hashfs/"&gt;Read more…&lt;/a&gt; (1 min remaining to read)&lt;/p&gt;&lt;/div&gt;</description><category>hashfs</category><category>python</category><guid>http://derrickgilland.com/posts/new-project-hashfs/</guid><pubDate>Fri, 05 Jun 2015 22:01:21 GMT</pubDate></item></channel></rss>

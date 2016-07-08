@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html prefix="
+og: http://ogp.me/ns#
+article: http://ogp.me/ns/article#
+" lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Deploying a Static Blog to Github Pages | Derrick Gilland</title>
+
+                <link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+
+                <link rel="alternate" type="application/rss+xml" title="RSS" href="../../rss.xml">
+
+      <link rel="canonical" href="http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/">
+
+            <link rel="icon" href="../../assets/img/favicon-32x32.png" sizes="32x32">
+            <link rel="icon" href="../../assets/img/favicon-192x192.png" sizes="192x192">
+            <link rel="icon" href="../../favicon.ico" sizes="16x16">
+            <link rel="icon" href="../../assets/img/favicon-96x96.png" sizes="96x96">
+            <link rel="icon" href="../../assets/img/favicon-160x160.png" sizes="160x160">
+
+
+
+    
+        <!--[if lt IE 9]><script src="../../assets/js/html5.js"></script><![endif]-->
+
+    
+
+    
+    <meta name="author" content="Derrick Gilland">
+        <link rel="prev" href="../first-post/" title="First Post" type="text/html">
+        <link rel="next" href="../pydash-release-v240/" title="pydash: Release v2.4.0" type="text/html">
+        <meta property="og:site_name" content="Derrick Gilland">
+    <meta property="og:title" content="Deploying a Static Blog to Github Pages">
+    <meta property="og:url" content="http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/">
+    <meta property="og:description" content="One of the challenges when deploying a static blog site to Github Pages is having a good workflow for accomplishing the task easily. By default Github Pages will use Jekyll to build your site for you,">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2015-01-06T16:02:53-05:00">
+           <meta property="article:tag" content="github">
+           <meta property="article:tag" content="static-generators">
+
+    
+    
+
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700%7CMerriweather:400,500%7CRaleway:400,500" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<!-- Menubar -->
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+<!-- This keeps the margins nice -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://derrickgilland.com/">
+
+                <span id="blog-title">Derrick Gilland</span>
+            </a>
+        </div>
+<!-- /.navbar-header -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                                <li>
+<a href="../../"><i class="fa fa-home fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../pages/about/">About</a>
+                </li>
+<li>
+<a href="../../pages/projects/">Projects</a>
+                </li>
+<li>
+<a href="../../archive.html">Archive</a>
+                </li>
+<li>
+<a href="../../categories/">Tags</a>
+
+                
+            </li>
+</ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                                    <li>
+<a href="https://github.com/dgilland"><i class="fa fa-github fa-lg"></i></a>
+                </li>
+<li>
+<a href="http://stackoverflow.com/users/681166/dgilland"><i class="fa fa-stack-overflow fa-lg"></i></a>
+                </li>
+<li>
+<a href="mailto:dgilland@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
+                </li>
+<li>
+<a href="../../rss.xml"><i class="fa fa-rss fa-lg"></i></a>
+
+                
+            </li>
+</ul>
+        </div>
+<!-- /.navbar-collapse -->
+    </div>
+<!-- /.container -->
+</nav>
+
+<!-- End of Menubar -->
+
+<div class="container" id="content" role="main">
+    <div class="body-content">
+        <!--Body content-->
+        <div class="row">
+            
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article">
+        <header>
+            <h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url" rel="bookmark">Deploying a Static Blog to Github Pages</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><time class="published dt-published" datetime="2015-01-06T16:02:53-05:00" itemprop="datePublished" title="January 06, 2015">January 06, 2015</time></p>
+                <p class="commentline">            <a href=".#disqus_thread" data-disqus-identifier="cache/posts/deploying-static-blog-to-github-pages.html">Comments</a>
+
+
+            
+        </p>
+</div>
+        
+    </header>
+
+    <div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<p>One of the challenges when deploying a static blog site to <a class="reference external" href="https://pages.github.com">Github Pages</a> is having a good workflow for accomplishing the task easily. By default Github Pages will use Jekyll to build your site for you, but if you're using something else besides Jekyll, then you're on your own.</p>
+<p>For my static blog site (powered by <a class="reference external" href="https://www.python.org/">Python</a> and <a class="reference external" href="http://getnikola.com">Nikola</a>), I decided to take the following approach:</p>
+<ul class="simple">
+<li>Have two repositories: (1) for the <a class="reference external" href="https://github.com/dgilland/blog">source code</a> and (2) for the <a class="reference external" href="https://github.com/dgilland/dgilland.github.io">deployed site</a>.</li>
+<li>Only maintain version history in the source code repository (1) while deploying a snapshot with no history to (2).</li>
+<li>Have a single command for deployment.</li>
+</ul>
+<!-- TEASER_END -->
+<p>I'm partial to using <a class="reference external" href="http://www.gnu.org/software/make/">Make</a> for creating a simple command line interface for a project. For my <tt class="docutils literal">Makefile</tt> I used several variables to make the command targets cleaner:</p>
+<pre class="code makefile"><a name="rest_code_f0245525903945f1b7331813300b2eac-1"></a><span class="c"># Python virtualenv</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-2"></a><span class="nv">ENV_NAME</span> <span class="o">=</span> env
+<a name="rest_code_f0245525903945f1b7331813300b2eac-3"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-4"></a><span class="c"># Prefix command to execute Python code from virtualenv</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-5"></a><span class="nv">ENV_ACT</span> <span class="o">=</span> . env/bin/activate <span class="o">&amp;&amp;</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-6"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-7"></a><span class="c"># Shortcut to invoke the nikola command line interface from virtualenv</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-8"></a><span class="nv">NIKOLA</span> <span class="o">=</span> <span class="k">$(</span>ENV_ACT<span class="k">)</span> <span class="nb">cd</span> <span class="k">$(</span>BLOG_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> nikola
+<a name="rest_code_f0245525903945f1b7331813300b2eac-9"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-10"></a><span class="c"># Source of site</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-11"></a><span class="nv">BLOG_DIR</span> <span class="o">=</span> blog
+<a name="rest_code_f0245525903945f1b7331813300b2eac-12"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-13"></a><span class="c"># Build output for site</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-14"></a><span class="nv">OUTPUT_DIR</span> <span class="o">=</span> <span class="k">$(</span>BLOG_DIR<span class="k">)</span>/output
+<a name="rest_code_f0245525903945f1b7331813300b2eac-15"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-16"></a><span class="c"># Staging folder for built site</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-17"></a><span class="nv">STAGING_DIR</span> <span class="o">=</span> site
+<a name="rest_code_f0245525903945f1b7331813300b2eac-18"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-19"></a><span class="c"># Github Page remote</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-20"></a><span class="nv">ORIGIN</span> <span class="o">=</span> git@github.com:dgilland/dgilland.github.io.git
+<a name="rest_code_f0245525903945f1b7331813300b2eac-21"></a>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-22"></a><span class="c"># Website domain (used for CNAME file)</span>
+<a name="rest_code_f0245525903945f1b7331813300b2eac-23"></a><span class="nv">DOMAIN</span> <span class="o">=</span> derrickgilland.com
+</pre>
+<p>The first step when deploying is to build the site from the source:</p>
+<pre class="code makefile"><a name="rest_code_144c59f4f83a477388dd487ea61d5049-1"></a><span class="nf">html</span><span class="o">:</span>
+<a name="rest_code_144c59f4f83a477388dd487ea61d5049-2"></a>    <span class="k">$(</span>NIKOLA<span class="k">)</span> build
+<a name="rest_code_144c59f4f83a477388dd487ea61d5049-3"></a>
+<a name="rest_code_144c59f4f83a477388dd487ea61d5049-4"></a><span class="c">    ## or fully expanded:</span>
+<a name="rest_code_144c59f4f83a477388dd487ea61d5049-5"></a><span class="c">    # . env/bin/activate &amp;&amp; cd blog &amp;&amp; nikola build</span>
+</pre>
+<p>However, this command alone isn't sufficient for a Nikola site since Nikola's build process doesn't clean the output directory before building. This could result in previously built files that are no longer a part of the source from making their way to the deployed site. To workaround this simply remove the output directory first:</p>
+<pre class="code makefile"><a name="rest_code_a16d05ab1ae44ce39687e4cdcd3400ce-1"></a><span class="nf">clean-output</span><span class="o">:</span>
+<a name="rest_code_a16d05ab1ae44ce39687e4cdcd3400ce-2"></a>    rm -rf <span class="k">$(</span>OUTPUT_DIR<span class="k">)</span>
+<a name="rest_code_a16d05ab1ae44ce39687e4cdcd3400ce-3"></a>
+<a name="rest_code_a16d05ab1ae44ce39687e4cdcd3400ce-4"></a><span class="c">    ## or fully expanded:</span>
+<a name="rest_code_a16d05ab1ae44ce39687e4cdcd3400ce-5"></a><span class="c">    # rm -rf blog/output</span>
+</pre>
+<p>Next, combine <tt class="docutils literal">make html</tt> and <tt class="docutils literal">make <span class="pre">clean-output</span></tt> into a single command (it's still useful to have <tt class="docutils literal">make html</tt> as a separate command for faster builds during development since Nikola utilizes <a class="reference external" href="http://pydoit.org/">doit</a> to speed up build times):</p>
+<pre class="code makefile"><a name="rest_code_08aceb7f97ad493bb813fd4005bab3cc-1"></a><span class="nf">new-html</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">output</span> <span class="n">html</span>
+</pre>
+<p>Now that we have our pre-deployment build command, we need the actual deployment target which will take our clean HTML output and send it to our Github Page repository:</p>
+<pre class="code makefile"><a name="rest_code_f9892777a132441681beffa9d8d858df-1"></a><span class="nf">deploy</span><span class="o">:</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-2"></a>    rm -rf <span class="k">$(</span>STAGING_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-3"></a>    cp -r <span class="k">$(</span>OUTPUT_DIR<span class="k">)</span> <span class="k">$(</span>STAGING_DIR<span class="k">)</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-4"></a>    <span class="nb">cd</span> <span class="k">$(</span>STAGING_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-5"></a>    <span class="nb">echo</span> <span class="k">$(</span>DOMAIN<span class="k">)</span> &gt; CNAME <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-6"></a>    touch .nojekyll <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-7"></a>    git init <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-8"></a>    git add . <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-9"></a>    git commit -m <span class="s2">"Build site"</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-10"></a>    git remote add origin <span class="k">$(</span>ORIGIN<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-11"></a>    git push -u --force origin master
+<a name="rest_code_f9892777a132441681beffa9d8d858df-12"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-13"></a><span class="c">    ## or expanded out and in simpler terms:</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-14"></a><span class="c">    ## Delete staging folder.</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-15"></a><span class="c">    # rm -rf site</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-16"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-17"></a><span class="c">    ## Copy output directory to staging folder.</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-18"></a><span class="c">    # cp -r blog/output site</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-19"></a><span class="c">    # cd site</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-20"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-21"></a><span class="c">    ## When hosting a root domain on Github Pages, a CNAME file is needed.</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-22"></a><span class="c">    # echo derrickgilland.com &gt; CNAME</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-23"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-24"></a><span class="c">    ## tell Github not to run Jekyll on the site</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-25"></a><span class="c">    # touch .nojekyll</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-26"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-27"></a><span class="c">    ## Initialize a new repository.</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-28"></a><span class="c">    # git init</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-29"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-30"></a><span class="c">    ## Commit all files.</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-31"></a><span class="c">    # git add .</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-32"></a><span class="c">    # git commit -m "Build site"</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-33"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-34"></a><span class="c">    ## Add git remote</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-35"></a><span class="c">    # git remote add origin git@github.com:dgilland/dgilland.github.io.git</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-36"></a>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-37"></a><span class="c">    ## Overwrite any existing history so that there is only a single commit</span>
+<a name="rest_code_f9892777a132441681beffa9d8d858df-38"></a><span class="c">    # git push -u --force origin master</span>
+</pre>
+<p>You'll notice that this command combines quite a few instructions which makes it a good candidate for conversion into a shell script proper. However, for this project I prefer to keep the implementation simple by leaving it fully defined in the makefile.</p>
+<p>Finally, to wrap things up, create a composite target which calls both <tt class="docutils literal">make <span class="pre">new-html</span></tt> and <tt class="docutils literal">make deploy</tt>:</p>
+<pre class="code makefile"><a name="rest_code_a493ff10f7c54d25b335d079a7bf322d-1"></a><span class="nf">publish</span><span class="o">:</span> <span class="n">new</span>-<span class="n">html</span> <span class="n">deploy</span>
+</pre>
+<p>Now we have our single command for full deployment which can be executed from the command line:</p>
+<pre class="code bash"><a name="rest_code_213af019fb274375a410cd27134797b9-1"></a>make publish
+</pre>
+<p>The current makefile I'm using looks something like this:</p>
+<pre class="code makefile"><a name="rest_code_d281ec9868eb4783be19abea96aae7de-1"></a><span class="c">##</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-2"></a><span class="c"># Variables</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-3"></a><span class="c">##</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-4"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-5"></a><span class="c"># Python virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-6"></a><span class="nv">ENV_NAME</span> <span class="o">=</span> env
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-7"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-8"></a><span class="c"># Prefix command to execute Python code from virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-9"></a><span class="nv">ENV_ACT</span> <span class="o">=</span> . env/bin/activate <span class="o">&amp;&amp;</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-10"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-11"></a><span class="c"># Shortcut to invoke pip command from virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-12"></a><span class="nv">PIP</span> <span class="o">=</span> <span class="k">$(</span>ENV_NAME<span class="k">)</span>/bin/pip
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-13"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-14"></a><span class="c"># Shortcut to invoke the nikola command line interface from virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-15"></a><span class="nv">NIKOLA</span> <span class="o">=</span> <span class="k">$(</span>ENV_ACT<span class="k">)</span> <span class="nb">cd</span> <span class="k">$(</span>BLOG_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> nikola
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-16"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-17"></a><span class="c"># Source of site</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-18"></a><span class="nv">BLOG_DIR</span> <span class="o">=</span> blog
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-19"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-20"></a><span class="c"># Build output for site</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-21"></a><span class="nv">OUTPUT_DIR</span> <span class="o">=</span> <span class="k">$(</span>BLOG_DIR<span class="k">)</span>/output
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-22"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-23"></a><span class="c"># Staging folder for built site used for deployment</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-24"></a><span class="nv">STAGING_DIR</span> <span class="o">=</span> site
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-25"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-26"></a><span class="c"># Github Page remote</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-27"></a><span class="nv">ORIGIN</span> <span class="o">=</span> git@github.com:dgilland/dgilland.github.io.git
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-28"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-29"></a><span class="c"># Website domain (used for CNAME file)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-30"></a><span class="nv">DOMAIN</span> <span class="o">=</span> derrickgilland.com
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-31"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-32"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-33"></a><span class="c">##</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-34"></a><span class="c"># Targets</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-35"></a><span class="c">##</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-36"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-37"></a><span class="c"># Build Python virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-38"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">build</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-39"></a><span class="nf">build</span><span class="o">:</span> <span class="n">clean</span> <span class="n">install</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-40"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-41"></a><span class="c"># Remove build files.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-42"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-43"></a><span class="nf">clean</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">env</span> <span class="n">clean</span>-<span class="n">files</span> <span class="n">clean</span>-<span class="n">output</span> <span class="n">clean</span>-<span class="n">staging</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-44"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-45"></a><span class="c"># Remove virtualenv.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-46"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">env</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-47"></a><span class="nf">clean-env</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-48"></a>    rm -rf <span class="k">$(</span>ENV_NAME<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-49"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-50"></a><span class="c"># Remove Python setup build files.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-51"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">files</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-52"></a><span class="nf">clean-files</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-53"></a>    rm -rf .tox
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-54"></a>    rm -rf .coverage
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-55"></a>    find . -name <span class="se">\*</span>.pyc -type f -delete
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-56"></a>    find . -name <span class="se">\*</span>.test.db -type f -delete
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-57"></a>    find . -depth -name __pycache__ -type d -exec rm -rf <span class="o">{}</span> <span class="se">\;</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-58"></a>    rm -rf dist *.egg* build
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-59"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-60"></a><span class="c"># Remove site build output folder.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-61"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">output</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-62"></a><span class="nf">clean-output</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-63"></a>    rm -rf <span class="k">$(</span>OUTPUT_DIR<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-64"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-65"></a><span class="c"># Remove site staging folder.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-66"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">staging</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-67"></a><span class="nf">clean-staging</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-68"></a>    rm -rf <span class="k">$(</span>STAGING_DIR<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-69"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-70"></a><span class="c"># Install Python virtualenv</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-71"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">install</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-72"></a><span class="nf">install</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-73"></a>    rm -rf <span class="k">$(</span>ENV_NAME<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-74"></a>    virtualenv --no-site-packages <span class="k">$(</span>ENV_NAME<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-75"></a>    <span class="k">$(</span>PIP<span class="k">)</span> install -r requirements.txt
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-76"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-77"></a><span class="c"># Create new blog post.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-78"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">post</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-79"></a><span class="nf">post</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-80"></a>    <span class="k">$(</span>NIKOLA<span class="k">)</span> new_post
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-81"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-82"></a><span class="c"># Create new blog page.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-83"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">page</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-84"></a><span class="nf">page</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-85"></a>    <span class="k">$(</span>NIKOLA<span class="k">)</span> new_page
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-86"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-87"></a><span class="c"># Run spell checker on file.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-88"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">spellcheck</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-89"></a><span class="nf">spellcheck</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-90"></a>    aspell check <span class="k">$(</span>f<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-91"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-92"></a><span class="c"># Build HTML site.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-93"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">html</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-94"></a><span class="nf">html</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-95"></a>    <span class="k">$(</span>NIKOLA<span class="k">)</span> build
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-96"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-97"></a><span class="c"># Build HTML site after removing output folder.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-98"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">new</span>-<span class="n">html</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-99"></a><span class="nf">new-html</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">output</span> <span class="n">html</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-100"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-101"></a><span class="c"># Serve site using dev server.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-102"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">serve</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-103"></a><span class="nf">serve</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-104"></a>    <span class="k">$(</span>NIKOLA<span class="k">)</span> serve
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-105"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-106"></a><span class="c"># Run html and serve targets.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-107"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">reload</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-108"></a><span class="nf">reload</span><span class="o">:</span> <span class="n">html</span> <span class="n">serve</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-109"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-110"></a><span class="c"># Deploy built site to repository.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-111"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">deploy</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-112"></a><span class="nf">deploy</span><span class="o">:</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-113"></a>    rm -rf <span class="k">$(</span>STAGING_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-114"></a>    cp -r <span class="k">$(</span>OUTPUT_DIR<span class="k">)</span> <span class="k">$(</span>STAGING_DIR<span class="k">)</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-115"></a>    <span class="nb">cd</span> <span class="k">$(</span>STAGING_DIR<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-116"></a>    <span class="nb">echo</span> <span class="k">$(</span>DOMAIN<span class="k">)</span> &gt; CNAME <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-117"></a>    touch .nojekyll <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-118"></a>    git init <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-119"></a>    git add . <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-120"></a>    git commit -m <span class="s2">"Build site"</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-121"></a>    git remote add origin <span class="k">$(</span>ORIGIN<span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-122"></a>    git push -u --force origin master
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-123"></a>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-124"></a><span class="c"># Run new-html and deploy targets.</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-125"></a><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">publish</span>
+<a name="rest_code_d281ec9868eb4783be19abea96aae7de-126"></a><span class="nf">publish</span><span class="o">:</span> <span class="n">new</span>-<span class="n">html</span> <span class="n">deploy</span>
+</pre>
+<p>The full source is available on <a class="reference external" href="https://github.com/dgilland/blog/blob/master/makefile">Github</a>. Feel free to modify it to suite your own needs</p>
+</div>
+    </div>
+    <aside class="postpromonav">
+    <nav>
+            <ul itemprop="keywords" class="tags">
+           <li><a class="tag p-category" href="../../categories/github/" rel="tag">github</a></li>
+           <li><a class="tag p-category" href="../../categories/static-generators/" rel="tag">static-generators</a></li>
+        </ul>
+
+            <ul class="pager">
+            <li class="previous">
+                <a href="../first-post/" rel="prev" title="First Post">Previous post</a>
+            </li>
+            <li class="next">
+                <a href="../pydash-release-v240/" rel="next" title="pydash: Release v2.4.0">Next post</a>
+            </li>
+        </ul>
+
+    </nav>
+    </aside>
+        <section class="comments">
+        <h2>Comments</h2>
+                        <div id="disqus_thread"></div>
+        <script>
+        var disqus_shortname ="derrickgilland",
+            disqus_url="http://derrickgilland.com/posts/deploying-static-blog-to-github-pages/",
+        disqus_title="Deploying a Static Blog to Github Pages",
+        disqus_identifier="cache/posts/deploying-static-blog-to-github-pages.html",
+        disqus_config = function () {
+            this.language = "en";
+        };
+        (function() {
+            var dsq = document.createElement('script'); dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+    <a href="//disqus.com" class="dsq-brlink" rel="nofollow">Comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+        </section>
+    
+</article>
+               <script>var disqus_shortname="derrickgilland";(function(){var a=document.createElement("script");a.async=true;a.src="//"+disqus_shortname+".disqus.com/count.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)}());</script>
+
+
+        </div>
+        <!--End of body content-->
+
+        <footer>
+            <a href="mailto:dgilland@gmail.com">Derrick Gilland</a> - Blog powered by <a href="http://getnikola.com" rel="nofollow">Nikola</a> 
+            
+        </footer>
+    </div>
+</div>
+
+            <script src="../../assets/js/all-nocdn.js"></script>
+    
+
+    <script>jQuery("a.image-reference,!.islink").colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script>
+    <!-- fancy dates -->
+    <script>
+    moment.locale("");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script>
+    <!-- end fancy dates -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58266216-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+</body>
+</html>
